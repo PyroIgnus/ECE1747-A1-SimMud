@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import subprocess
 
@@ -22,7 +23,7 @@ def main(args):
 
     # Create N client processes
     for i in range(client_n):
-        subprocess.Popen([client, "localhost:" + port])
+        subprocess.Popen([client, "localhost:" + port], stdout=open(os.devnull, 'wb'))
 
 if __name__ == "__main__":
     main(sys.argv)
