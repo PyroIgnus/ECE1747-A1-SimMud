@@ -32,9 +32,9 @@ protected:
 	/* general data */
 	int t_id;
 	SDL_barrier *barrier;
-	
+
 	MessageModule* comm;
-	
+
 public:
 	double avg_wui;			// average_world_update_interval
 	double avg_rui;			// average_regular_update_interval
@@ -43,7 +43,7 @@ public:
 public:
 	/* Constructor and setup methods */
 	WorldUpdateModule( int id, MessageModule *_comm, SDL_barrier *_barr );
-	
+
 	/* main loop */
 	void run();
 
@@ -51,7 +51,7 @@ public:
 	void handleClientJoinRequest(Player* p, IPaddress addr);
 	void handleClientLeaveRequest(Player* p);
 
-	void handle_move(Player* p, int _dir);	
+	void handle_move(Player* p, int _dir);
 };
 
 #endif

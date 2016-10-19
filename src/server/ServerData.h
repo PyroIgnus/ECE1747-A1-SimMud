@@ -21,15 +21,16 @@
 
 #include "../General.h"
 #include "../utils/Configurator.h"
+#include "../utils/Log.h"
 
 #include "WorldMap.h"
 
 
 struct ServerData
 {
-public:	
-	WorldMap	wm;	
-	
+public:
+	WorldMap	wm;
+
 	char *log_file;
 
 	/* server */
@@ -57,26 +58,26 @@ public:
 	int quest_first;		/* time until the first quest occurs */
 	int quest_between;		/* maximum time between quests in seconds */
 	int quest_min, quest_max;	/* the minimum and maximum duration of quests in seconds */
-	
+
 	int send_start_quest, send_end_quest;
-	Vector2D quest_pos;	
+	Vector2D quest_pos;
 
 	/* messages to display */
 	int display_all_warnings;	/* to display all warning messages */
 	int display_quests;
 	int display_actions;
 	int display_user_on_off;
-	int display_migrations;	
+	int display_migrations;
 
 
 	ServerData( char* conf_file );
-	
+
 private:
 	void dataFromConfigurator( Configurator &conf );
-	
+
 };
 
 extern ServerData *sd;
-
+extern TSLogger* log;
 
 #endif

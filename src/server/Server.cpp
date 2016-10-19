@@ -16,9 +16,12 @@
 *
 ***************************************************************************************************/
 
+#include <iostream>
+
 #include "../General.h"
 #include "../utils/Configurator.h"
 #include "../utils/SDL_barrier.h"
+#include "../utils/Log.h"
 
 #include "../comm/MessageModule.h"
 
@@ -29,6 +32,7 @@
 
 int local_port = 0;
 ServerData	*sd = NULL;
+TSLogger *log = NULL;
 
 /***************************************************************************************************
 *
@@ -40,7 +44,7 @@ int module_thread(void *data)
 {
 	Module *module = (Module*)data;
 
-	try{							module->run();							} 
+	try{							module->run();							}
 	catch( const char *err ){		printf("[ERROR] %s\n", err);exit(-1);	}
 
 	return 0;
@@ -56,14 +60,14 @@ void init(int argc, char *argv[])
 {
 	/* interpret command line arguments */
 	if ( argc < 3 )		throw "Usage: server <config_file> <port> [<log_file>]";
-	
-	
+
+
 	/* local port */
 	sscanf( argv[2], "%d", &local_port);
 	if ( local_port < 1 )			throw "The port must be an integer larger than 0";
 	printf( "Starting server on port %d\n", local_port );
-	
-	    
+
+
     srand( (unsigned int)time(NULL) );
     /*
 	if ( SDL_Init( SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE ) < 0 ) // |SDL_INIT_VIDEO
@@ -77,6 +81,12 @@ void init(int argc, char *argv[])
 	sd = new ServerData( argv[1] );	assert( sd );
 	sd->log_file = ( argc >= 4 ) ? argv[3] : NULL;
 	sd->wm.generate();
+
+    TSLogger::initialize();
+    log = TSLogger::getInstance();
+    if(sd->log_file != NULL){
+        log->open(sd->log_file);
+    }
 }
 
 void finish()
@@ -98,7 +108,7 @@ void finish()
 int main(int argc, char *argv[])
 {
 	int i;
-    
+
 	try
 	{
 		#ifdef __COMPRESSED_MESSAGES__
@@ -108,26 +118,26 @@ int main(int argc, char *argv[])
 		/* initialize */
 		init(argc, argv);
 		printf("Number of Threads @ main: %d\n",  sd->num_threads);
-        
+
 		/* create server modules */
        	MessageModule *comm_module = new MessageModule( local_port, sd->num_threads, 0 );	assert( comm_module );
-		
+
 		//* WorldUpdateModule
-        SDL_barrier *wu_barrier = SDL_CreateBarrier( sd->num_threads );						assert( wu_barrier ); 
-		WorldUpdateModule **wu_module = new WorldUpdateModule*[ sd->num_threads ];			assert( wu_module );			
+        SDL_barrier *wu_barrier = SDL_CreateBarrier( sd->num_threads );						assert( wu_barrier );
+		WorldUpdateModule **wu_module = new WorldUpdateModule*[ sd->num_threads ];			assert( wu_module );
 		for ( i = 0; i < sd->num_threads; i++ )
 		{
 			wu_module[i] = new WorldUpdateModule( i, comm_module, wu_barrier );				assert( wu_module[i] );
 		}
-		
-		
+
+
 		//* User input loop (type 'quit' to exit)
-		char cmd[256]; 
+		char cmd[256];
 		while ( true )
-		{			
+		{
 			scanf("%s", cmd);
 			if ( !strcmp(cmd, "exit") || !strcmp(cmd, "quit") || !strcmp(cmd, "q") )	exit(0);
-		}		
+		}
 
 		finish();
 
@@ -138,4 +148,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-

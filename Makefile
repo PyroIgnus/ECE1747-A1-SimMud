@@ -53,7 +53,7 @@ MASTER_OBJS = $(patsubst $(SOURCE_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(MASTER_SRCS))
 ## CLIENT
 CLIENT_DIR  = $(SOURCE_DIR)/client
 CLIENT_SRCS_CPP = $(SHARED_SOURCES) $(GRAPHICS_SOURCES) $(GAME_SOURCES_CPP) $(COMM_SOURCES) \
-				$(wildcard $(CLIENT_DIR)/*.cpp) $(wildcard $(CLIENT_DIR)/AStar/*.cpp) 	
+				$(wildcard $(CLIENT_DIR)/*.cpp) $(wildcard $(CLIENT_DIR)/AStar/*.cpp)
 CLIENT_SRCS_C   = $(GAME_SOURCES_C)
 CLIENT_OBJS = $(patsubst $(SOURCE_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CLIENT_SRCS_CPP))	\
               $(patsubst $(SOURCE_DIR)/%.c,$(BUILD_DIR)/%.o,$(CLIENT_SRCS_C))
@@ -73,7 +73,7 @@ HOST_NAME := `uname -n`
 ##
 ####################################################################################################
 
-all: client server 
+all: client server
 
 ## Create directories for object files
 $(BUILD_DIR):
