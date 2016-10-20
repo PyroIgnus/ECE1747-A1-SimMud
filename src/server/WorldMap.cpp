@@ -1,4 +1,5 @@
 #include "ServerData.h"
+#include <climits>
 
 #include "WorldMap.h"
 
@@ -290,7 +291,7 @@ void WorldMap::reassignRegion( Region* r, int new_layout )
  */
 
 /**
- * 
+ * Deprecated.  Apparently we don't need to determine the loading levels at all.
  */
 bool WorldMap::isOverloaded( int n_pl ) {
 	bool overloaded = false;
@@ -313,10 +314,11 @@ int WorldMap::shedRegionsToThread(int new_layout, int old_layout) {
 	Vector2D pos;
 	for( i = 0, pos.x = 0; i < n_regs.x; i++, pos.x += regmin.x ) {
 		for( j = 0, pos.y = 0; j < n_regs.y; j++, pos.y += regmin.y ) {
-			//TODO: Figure out how to interpret the loading levels (specifically safe_level)
-			if (regions[i][j].layout == old_layout && (regions[i][j].n_pls + tStats[new_layout].number_of_players) < safe_level) {
+			//TODO: No need to determine whether the shed is safe since we apparently do not need thresholds.
+			if (regions[i][j].layout == old_layout) {
 				reassignRegion(&regions[i][j], new_layout);
 				numRegionsShed += 1;
+				return numRegionsShed;
 			}
 		}
 	}
@@ -328,24 +330,27 @@ void WorldMap::balance_lightest()
 {
 	/* Shed load onto lightest loaded server */
 	
+	int lightestCount = INT_MAX;
+	int lightestIndex = -1;
+	int overloadedCount = INT_MIN;
+	int overloadedIndex = -1;
+	
 	// Iterate through each thread and get load for each
 	int i;
 	for(i = 0; i < sd->num_threads; i++) {
-		if (isOverloaded(tStats[i].number_of_players)) {
-			// Determine lightest node
-			//TODO: Add criterion where lightest has to be below light threshold
-			int j;
-			int lightest = tStats[i].number_of_players;
-			for(j = 0; j < sd->num_threads; j++) {
-				if (tStats[j].number_of_players > tStats[i].number_of_players && tStats[j].number_of_players < sd->light_level) {
-					lightest = j;
-				}
-			}
-			
-			// Shed to lightest node
-			int numRegionsShed = shedRegionsToThread(lightest, i);
+		
+		if (lightestCount < tStats[i].number_of_players) {
+			lightestCount = tStats[i].number_of_players;
+			lightestIndex = i;
+		}
+		if (overloadedCount > tStats[i].number_of_players) {
+			overloadedCount = tStats[i].number_of_players;
+			overloadedIndex = i;
 		}
 	}
+	
+	// Shed one region to lightest node
+	int numRegionsShed = shedRegionsToThread(lightestIndex, overloadedIndex);
 }
 
 void WorldMap::balance_spread()
