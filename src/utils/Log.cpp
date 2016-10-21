@@ -22,7 +22,7 @@ TSLogger* TSLogger::getInstance(){
 }
 
 void TSLogger::open(std::string filename){
-    this->outfile.open(filename, std::fstream::in | std::fstream::out | std::fstream::trunc | std::ios::binary);
+    this->outfile.open(filename.c_str(), std::fstream::in | std::fstream::out | std::fstream::trunc | std::ios::binary);
 }
 
 void TSLogger::close(){

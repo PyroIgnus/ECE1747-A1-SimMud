@@ -23,21 +23,21 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 	/* server */
 	this->num_threads 			  = conf.getIntAttribute("server.number_of_threads");
 	this->regular_update_interval = conf.getIntAttribute("server.regular_update_interval");
-	
+
 	printf("Number of threads: %d\n", this->num_threads);
     if ( this->num_threads > MAX_THREADS )
 	{
 		printf("The maximum number of threads is %d\n", MAX_THREADS);
 		throw "Config file: Too many threads";
-	}	
+	}
 	if ( this->regular_update_interval < 0 )		throw "Config file: Regular update interval must be positive";
-	
+
 	/* load balance */
 	strcpy( this->algorithm_name, conf.getAttribute( "server.balance" ) );
 	this->load_balance_limit= conf.getIntAttribute( "server.load_balance_limit" ) * 1000;
 	this->overloaded_level 	= conf.getFloatAttribute( "server.overloaded_level" );
 	this->light_level 		= conf.getFloatAttribute( "server.light_level" );
-	
+
 	if ( this->load_balance_limit <= 0 )
 	{
 		printf("[WARNING] Config file error: load_balance_limit must be greater than 0. Default value 10 used\n");
@@ -47,14 +47,14 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 	{
 		printf("[WARNING] Config file error: overloaded_level must be greater than 1. Default value 1.2 used\n");
 		this->overloaded_level = 1.2;
-	}	
+	}
 	if ( this->light_level <= 0 || this->light_level > this->overloaded_level )
 	{
 		printf("[WARNING] Config file error: light_level must be greater than 0 and smaller than overloaded_level. Default value 1.0 used\n");
 		this->light_level = 1.0;
 	}
 
-	
+
 	/* Map and region size */
 	this->wm.size.x		= conf.getIntAttribute("map.width") * CLIENT_MATRIX_SIZE ;
 	this->wm.size.y		= conf.getIntAttribute("map.height") * CLIENT_MATRIX_SIZE;
@@ -62,7 +62,7 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 	this->wm.regmin.y	= conf.getIntAttribute("map.region_min_height") * CLIENT_MATRIX_SIZE;
 	this->wm.regmax.x	= conf.getIntAttribute("map.region_max_width") * CLIENT_MATRIX_SIZE;
 	this->wm.regmax.y	= conf.getIntAttribute("map.region_max_height") * CLIENT_MATRIX_SIZE;
-	if ( this->wm.size.x <= 0 || this->wm.size.y <= 0 )	
+	if ( this->wm.size.x <= 0 || this->wm.size.y <= 0 )
 		throw "Config file: Invalid map dimensions";
 
 	/* Region data */
@@ -70,8 +70,8 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 	this->wm.resources	= conf.getIntAttribute("map.resources");
 	this->wm.min_res	= conf.getIntAttribute("map.min_res");
 	this->wm.max_res	= conf.getIntAttribute("map.max_res");
-	
-	
+
+
 
 	/* Player data */
 	this->player_min_life = conf.getIntAttribute("player.min_life");
@@ -88,11 +88,11 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 		this->quest_bonus < 0 || this->quest_bonus > 100 ||
 		this->quest_between <= 0 )
 		throw "Invalid or incomplete values for quest properties";
-		
+
 	send_start_quest = 0;
 	send_end_quest   = 0;
-	
-	/* ServerOutput */	
+
+	/* ServerOutput */
 	this->display_all_warnings 	= conf.getIntAttribute("display.all_warnings");
 	this->display_quests 		= conf.getIntAttribute("display.quests");
 	this->display_actions 		= conf.getIntAttribute("display.actions");
@@ -105,9 +105,7 @@ void ServerData::dataFromConfigurator( Configurator &conf )
 ServerData::ServerData( char* conf_file )
 {
 	Configurator conf;
-	
+
 	if( !conf.addFile( conf_file ) )	throw "Invalid configuration file";
 	dataFromConfigurator( conf );
 }
-
-
