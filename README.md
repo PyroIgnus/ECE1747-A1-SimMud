@@ -57,3 +57,16 @@ quest.between = 20							//	time between quests
 
 quest.min = 40								//	min/max duration of a quest (seconds)
 quest.max = 90
+
+3. Testing it
+We are using four different configuration files for each different scenario:
+ - config/config_static_nquest.ini: Used for running static load management with no quests
+ - config/config_static_quest.ini: Used for running static load management with quests
+ - config/config_lightest_nquest.ini: Used for running lightest load management with no quests
+ - config/config_lightest_quest.ini: Used for running lightest load management with quests
+
+An example of using the automated test script for lightest load management with quests, on port 8080, writing to logfile logs/lightest_quest.log, and with 500 clients
+tools/create_log.py ./server ./client configs/config_lightest_quest.ini 8080 logs/lightest_quest.log 500
+
+An example of using the log plotter:
+tools/parse_log.py logs/lightest_quest.log
