@@ -5,6 +5,25 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Flag to save graphs automatically or not
+SAVE_GRAPHS = False
+
+def moving_average(data, thread_ids, min_time, max_time, window=5):
+    # Compute moving average
+    running_average_window = window * 1000
+    time_splits = np.arange(0, max_time - min_time, running_average_window)
+    time_windows = [(time_splits[i], time_splits[i + 1]) for i in range(time_splits.shape[0] - 1)]
+    data_ma = dict()
+    for thread_id in thread_ids:
+        data_ma[thread_id] = np.zeros((len(time_windows), data[thread_id].shape[1]), np.uint32)
+        for i in range(len(time_windows)):
+            time_window = time_windows[i]
+            idx = np.where(np.logical_and(time_window[0] <= data[thread_id][:, 0], data[thread_id][:, 0] <= time_window[1]))[0]
+            data_ma[thread_id][i, 1:] = np.average(data[thread_id][idx, 1:], axis=0)
+            data_ma[thread_id][i, 0] = (time_window[0] + time_window[1]) / 2.
+
+    return data_ma
+
 def graph(fig, thread_ids, data, xticks, xticklabels):
     # Create a 4-plot graph of each property
     for i in range(1, 5):
@@ -52,21 +71,21 @@ def main(args):
         data[thread_id] = data_csv[np.where(data_csv[:, 0] == thread_id)[0], 1:]
         data[thread_id][:, 0] -= min_time
 
-    # Compute moving average
-    running_average_window = 5 * 1000
-    time_splits = np.arange(0, max_time - min_time, running_average_window)
-    time_windows = [(time_splits[i], time_splits[i + 1]) for i in range(time_splits.shape[0] - 1)]
-    data_ma = dict()
-    for thread_id in thread_ids:
-        data_ma[thread_id] = np.zeros((len(time_windows), data[thread_id].shape[1]), np.uint32)
-        for i in range(len(time_windows)):
-            time_window = time_windows[i]
-            idx = np.where(np.logical_and(time_window[0] <= data[thread_id][:, 0], data[thread_id][:, 0] <= time_window[1]))[0]
-            data_ma[thread_id][i, 1:] = np.average(data[thread_id][idx, 1:], axis=0)
-            data_ma[thread_id][i, 0] = (time_window[0] + time_window[1]) / 2.
+    # Take the commulative running average and graph it
+    data_ma = moving_average(data, thread_ids, min_time, max_time)
+    cum_fig = plt.figure()
+    graph(cum_fig, thread_ids, data_ma, xticks, xticklabels)
 
-    # Create graph
-    graph(plt.figure(), thread_ids, data_ma, xticks, xticklabels)
+    # Take the instantaneous running average and graph it
+    for thread_id in thread_ids:
+        data[thread_id][1:, 1:] = np.diff(data[thread_id][:, 1:], axis=0)
+    data_ma = moving_average(data, thread_ids, min_time, max_time)
+    inst_fig = plt.figure()
+    graph(inst_fig, thread_ids, data_ma, xticks, xticklabels)
+
+    if SAVE_GRAPHS:
+        cum_fig.savefig(logfile.replace(".log", ".cum.png"))
+        inst_fig.savefig(logfile.replace(".log", ".inst.png"))
 
     # Create a tight layout and display
     plt.show()
