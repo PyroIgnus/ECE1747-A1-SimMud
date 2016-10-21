@@ -315,7 +315,8 @@ int WorldMap::shedRegionsToThread(int new_layout, int old_layout) {
 	for( i = 0, pos.x = 0; i < n_regs.x; i++, pos.x += regmin.x ) {
 		for( j = 0, pos.y = 0; j < n_regs.y; j++, pos.y += regmin.y ) {
 			//TODO: No need to determine whether the shed is safe since we apparently do not need thresholds.
-			if (regions[i][j].layout == old_layout) {
+			if (regions[i][j].layout == old_layout && tStats[old_layout].number_of_regions != 1) {
+				printf("Reassigning region from %d to %d\n", old_layout, new_layout);
 				reassignRegion(&regions[i][j], new_layout);
 				numRegionsShed += 1;
 				return numRegionsShed;
