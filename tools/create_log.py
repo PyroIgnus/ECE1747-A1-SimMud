@@ -18,7 +18,7 @@ def main(args):
 
     # Make sure argument has some default value
     client_n = int(args[6]) if len(args) >= 7 else 500
-    run_time = int(args[7]) if len(args) == 8 else 1
+    run_time = int(args[7]) if len(args) == 8 else 5
 
     # Create a server process
     server = subprocess.Popen([server, config, port, logfile])
