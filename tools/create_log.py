@@ -26,6 +26,7 @@ def main(args):
     # Create N client processes
     clients = [0] * client_n
     for i in range(client_n):
+<<<<<<< HEAD
         clients[i] = subprocess.Popen([client, "localhost:" + port], stdout=open(os.devnull, 'wb'))
 
     # Wait for 5 minutes
@@ -37,6 +38,9 @@ def main(args):
     # Kill the children
     for i in range(client_n):
         clients[i].kill()
+=======
+        subprocess.Popen([client, "localhost:" + port], stdout=open(os.devnull, 'wb'))
+>>>>>>> f011253f4f633cabe6570083d0cf21e8812098fb
 
 if __name__ == "__main__":
     main(sys.argv)
